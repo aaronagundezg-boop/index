@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Maestro de Diagnósticos y Objetivos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        metal: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        steel: {
+                            light: '#f8fafc',
+                            DEFAULT: '#0ea5e9',
+                            dark: '#0369a1',
+                            accent: '#0284c7',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .metallic-gradient {
+            background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #38bdf8 100%);
+        }
+        .metallic-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease-in-out;
+        }
+        .metallic-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.1), 0 4px 6px -2px rgba(14, 165, 233, 0.05);
+            border-color: #7dd3fc;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col bg-slate-50">
+
+    <header class="metallic-gradient text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-white/10 rounded-xl backdrop-blur-md border border-white/20 shadow-inner">
+                    <i data-lucide="shield-check" class="w-7 h-7 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">Catálogo Maestro de Diagnósticos y Objetivos</h1>
+                    <p class="text-xs text-sky-100 font-medium">55 Funcionales y 55 Transversales • 11 Áreas Temáticas Especializadas</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="relative flex-1 md:w-80">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-sky-200">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Buscar por diagnóstico u objetivo..." 
+                        class="w-full pl-9 pr-4 py-2 bg-slate-900/30 border border-sky-300/30 rounded-xl text-sm text-white placeholder-sky-200/70 focus:outline-none focus:ring-2 focus:ring-white shadow-inner">
+                </div>
+                <button onclick="app.exportData()" class="flex items-center gap-2 px-4 py-2 bg-white hover:bg-sky-50 text-sky-900 rounded-xl text-sm font-semibold border border-white/40 transition-all shadow-md whitespace-nowrap">
+                    <i data-lucide="download" class="w-4 h-4 text-sky-700"></i>
+                    <span>Exportar CSV</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+        
+        <!-- Interactive Metrics Cards Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div onclick="app.handleCardClick('all')" class="metallic-card p-5 rounded-2xl flex items-center justify-between border-l-4 border-l-sky-600 cursor-pointer hover:bg-sky-50/40 transition-all">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Diagnósticos</p>
+                    <p id="totalCount" class="text-3xl font-extrabold text-slate-900 mt-1">110</p>
+                    <span class="text-xs text-sky-600 font-medium underline mt-1 inline-block">Ver todos los registros</span>
+                </div>
+                <div class="p-3.5 bg-sky-50 rounded-xl text-sky-600">
+                    <i data-lucide="layers" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <div onclick="app.handleCardClick('Funcional')" class="metallic-card p-5 rounded-2xl flex items-center justify-between border-l-4 border-l-sky-500 cursor-pointer hover:bg-sky-50/40 transition-all">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Funcionales</p>
+                    <p id="funcionalCount" class="text-3xl font-extrabold text-sky-600 mt-1">55</p>
+                    <span class="text-xs text-sky-600 font-medium underline mt-1 inline-block">Filtrar funcionales</span>
+                </div>
+                <div class="p-3.5 bg-sky-50 rounded-xl text-sky-600">
+                    <i data-lucide="cpu" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <div onclick="app.handleCardClick('Transversal')" class="metallic-card p-5 rounded-2xl flex items-center justify-between border-l-4 border-l-cyan-600 cursor-pointer hover:bg-cyan-50/40 transition-all">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Transversales</p>
+                    <p id="transversalCount" class="text-3xl font-extrabold text-cyan-700 mt-1">55</p>
+                    <span class="text-xs text-cyan-600 font-medium underline mt-1 inline-block">Filtrar transversales</span>
+                </div>
+                <div class="p-3.5 bg-cyan-50 rounded-xl text-cyan-600">
+                    <i data-lucide="git-merge" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <div onclick="app.toggleAreaExplorer()" class="metallic-card p-5 rounded-2xl flex items-center justify-between border-l-4 border-l-blue-500 cursor-pointer hover:bg-blue-50/40 transition-all">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Áreas Temáticas</p>
+                    <p id="areasCount" class="text-3xl font-extrabold text-slate-800 mt-1">11</p>
+                    <span id="areaExplorerToggleText" class="text-xs text-blue-600 font-medium underline mt-1 inline-block">Abrir para explorar áreas (1-11)</span>
+                </div>
+                <div class="p-3.5 bg-blue-50 rounded-xl text-blue-600">
+                    <i data-lucide="folder-kanban" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Area Explorer Drawer / Modal Container (Initially hidden, opens on clicking Areas Tematicas card) -->
+        <div id="areaExplorerSection" class="metallic-card rounded-2xl p-6 hidden bg-white border border-sky-200">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-sky-100 text-sky-700 rounded-lg">
+                        <i data-lucide="compass" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base">Explorador de las 11 Áreas Temáticas Oficiales</h3>
+                </div>
+                <button onclick="app.toggleAreaExplorer()" class="text-slate-400 hover:text-slate-700 text-xs font-semibold px-3 py-1.5 bg-slate-100 rounded-lg">Cerrar Explorador</button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Selecciona cualquiera de las 11 áreas temáticas para visualizar exclusivamente sus 5 diagnósticos funcionales y 5 transversales correspondientes:</p>
+            <div id="areaExplorerGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <!-- Dynamically populated 1 to 11 areas -->
+            </div>
+        </div>
+
+        <!-- Filter Controls Bar -->
+        <div class="metallic-card p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 bg-white shadow-sm">
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                <span class="text-sm font-semibold text-slate-700 flex items-center gap-1.5">
+                    <i data-lucide="filter" class="w-4 h-4 text-sky-600"></i> Tipo:
+                </span>
+                <div id="typeFilterButtons" class="inline-flex rounded-xl border border-slate-200 bg-slate-100 p-1 shadow-inner">
+                    <button onclick="app.setTypeFilter('all')" class="type-btn px-4 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white shadow-sm transition-all">Todos (110)</button>
+                    <button onclick="app.setTypeFilter('Funcional')" class="type-btn px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Funcionales (55)</button>
+                    <button onclick="app.setTypeFilter('Transversal')" class="type-btn px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Transversales (55)</button>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                <div class="flex items-center gap-2">
+                    <label for="areaFilter" class="text-sm font-semibold text-slate-700 whitespace-nowrap">Área:</label>
+                    <select id="areaFilter" onchange="app.setAreaFilter(this.value)" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-sky-500 focus:border-sky-500 block p-2.5 shadow-sm min-w-[280px]">
+                        <option value="all">Todas las 11 Áreas Temáticas</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-inner">
+                    <button id="viewGridBtn" onclick="app.setViewMode('grid')" class="p-2 rounded-lg text-sky-600 bg-white shadow-sm transition-colors" title="Vista Cuadrícula">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    </button>
+                    <button id="viewTableBtn" onclick="app.setViewMode('table')" class="p-2 rounded-lg text-slate-500 hover:bg-white transition-colors" title="Vista Tabla">
+                        <i data-lucide="table" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="contentContainer" class="flex-1">
+            <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="paginationContainer" class="flex justify-between items-center py-4 border-t border-slate-200">
+            <span id="paginationInfo" class="text-sm font-medium text-slate-600">Mostrando registros...</span>
+            <div class="flex gap-2">
+                <button id="prevPageBtn" onclick="app.prevPage()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all">Anterior</button>
+                <button id="nextPageBtn" onclick="app.nextPage()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all">Siguiente</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Detailed View -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full border border-slate-200 overflow-hidden transform transition-all">
+            <div class="metallic-gradient px-6 py-5 flex justify-between items-center text-white">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/10 rounded-xl">
+                        <i data-lucide="file-text" class="w-5 h-5 text-sky-100"></i>
+                    </div>
+                    <h3 id="modalTitle" class="font-bold text-lg">Detalle del Diagnóstico</h3>
+                </div>
+                <button onclick="app.closeModal()" class="text-sky-100 hover:text-white p-1.5 rounded-xl bg-white/10 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-sky-600">Tipo de Diagnóstico</span>
+                        <p id="modalType" class="text-sm font-semibold text-slate-900 mt-1"></p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-sky-600">Área Temática</span>
+                        <p id="modalArea" class="text-sm font-semibold text-slate-900 mt-1"></p>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nombre del Diagnóstico</span>
+                    <p id="modalName" class="text-base font-bold text-slate-900 mt-1.5 bg-sky-50/50 p-4 rounded-2xl border border-sky-100"></p>
+                </div>
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Objetivo Estratégico / Operativo</span>
+                    <p id="modalObjective" class="text-sm text-slate-700 mt-1.5 bg-slate-50 p-4 rounded-2xl border border-slate-200 leading-relaxed font-medium"></p>
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
+                <button onclick="app.closeModal()" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-sm font-semibold transition-all shadow-md">Cerrar Ventana</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50 border border-slate-700">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-sky-400"></i>
+        <span id="toastMessage" class="text-sm font-semibold">Acción realizada con éxito</span>
+    </div>
+
+    <script>
+        // Exactly 110 dataset: exactly 55 Functional and 55 Transversal across the requested 11 exact Thematic Areas (10 items per area: 5 functional, 5 transversal)
+        const rawDataset = [
+            // --- ÁREA 1: Industria y manufactura (5 Funcionales, 5 Transversales) ---
+            { id: 1, name: "Diagnóstico de Automatización y Robótica en Líneas de Producción", type: "Funcional", area: "1. Industria y manufactura", objective: "Evaluar el nivel de integración robótica y sistemas ciberfísicos para elevar el rendimiento industrial." },
+            { id: 2, name: "Diagnóstico de Cultura de Manufactura Esbelta (Lean Manufacturing)", type: "Transversal", area: "1. Industria y manufactura", objective: "Inculcar prácticas de reducción de desperdicios y mejora continua en todos los turnos operativos." },
+            { id: 3, name: "Diagnóstico de Eficiencia Energética y Calidad de Energía Industrial", type: "Funcional", area: "1. Industria y manufactura", objective: "Monitorear el consumo eléctrico y térmico para minimizar costos operativos y huella de carbono." },
+            { id: 4, name: "Diagnóstico de Seguridad Industrial y Salud Ocupacional en Planta", type: "Transversal", area: "1. Industria y manufactura", objective: "Garantizar protocolos de protección para cero accidentes en áreas de alta peligrosidad manufacturera." },
+            { id: 5, name: "Diagnóstico de Mantenimiento Predictivo y Confiabilidad de Maquinaria", type: "Funcional", area: "1. Industria y manufactura", objective: "Implementar sensores de vibración y termografía para anticipar fallas imprevistas en equipos pesados." },
+            { id: 6, name: "Diagnóstico de Capacitación Técnica y Polivalencia del Personal", type: "Transversal", area: "1. Industria y manufactura", objective: "Desarrollar habilidades múltiples en operarios para rotación flexible en líneas de producción." },
+            { id: 7, name: "Diagnóstico de Gestión de Calidad Metrológica y Tolerancias", type: "Funcional", area: "1. Industria y manufactura", objective: "Verificar la calibración y precisión de instrumentos de medición en lotes de fabricación." },
+            { id: 8, name: "Diagnóstico de Ergonomía en Estaciones de Trabajo Industrial", type: "Transversal", area: "1. Industria y manufactura", objective: "Disminuir trastornos musculoesqueléticos en operarios mediante rediseño ergonómico de puestos." },
+            { id: 9, name: "Diagnóstico de Cadena de Suministro de Insumos y Materia Prima", type: "Funcional", area: "1. Industria y manufactura", objective: "Asegurar abasto continuo de materiales clave sin incurrir en excesos de inventario en almacén." },
+            { id: 10, name: "Diagnóstico de Gestión de Residuos y Economía Circular Fabril", type: "Transversal", area: "1. Industria y manufactura", objective: "Reutilizar subproductos de fabricación para minimizar el impacto ecológico industrial." },
+
+            // --- ÁREA 2: Comercio (5 Funcionales, 5 Transversales) ---
+            { id: 11, name: "Diagnóstico de Eficiencia en el Punto de Venta (POS)", type: "Funcional", area: "2. Comercio", objective: "Optimizar flujos de cobro, control de inventarios en piso y experiencia de caja en establecimientos." },
+            { id: 12, name: "Diagnóstico de Cultura de Servicio y Atención al Cliente en Piso", type: "Transversal", area: "2. Comercio", objective: "Capacitar al personal de mostrador en empatía, resolución de conflictos y técnicas de venta consultiva." },
+            { id: 13, name: "Diagnóstico de Omnicanalidad y Comercio Electrónico (E-commerce)", type: "Funcional", area: "2. Comercio", objective: "Sincronizar el catálogo de tienda física con plataformas digitales para entregas rápidas y confiables." },
+            { id: 14, name: "Diagnóstico de Rotación de Inventarios y Merma Comercial", type: "Funcional", area: "2. Comercio", objective: "Identificar productos de lento movimiento para aplicar estrategias de liquidación y evitar pérdidas." },
+            { id: 15, name: "Diagnóstico de Clima Laboral y Motivación en Equipos de Tienda", type: "Transversal", area: "2. Comercio", objective: "Fomentar un ambiente de trabajo entusiasta para reducir la alta rotación de personal en piso de venta." },
+            { id: 16, name: "Diagnóstico de Visual Merchandising y Exhibición de Productos", type: "Funcional", area: "2. Comercio", objective: "Maximizar el atractivo visual de anaqueles y vitrinas para impulsar compras por impulso." },
+            { id: 17, name: "Diagnóstico de Programas de Lealtad y Retención de Compradores", type: "Transversal", area: "2. Comercio", objective: "Implementar incentivos personalizados para incrementar la frecuencia de recompra de clientes habituales." },
+            { id: 18, name: "Diagnóstico de Logística de Última Milla y Entregas Locales", type: "Funcional", area: "2. Comercio", objective: "Agilizar despachos a domicilio reduciendo tiempos de espera y garantizando integridad del producto." },
+            { id: 19, name: "Diagnóstico de Seguridad y Prevención de Fichas Rojas/Robos", type: "Transversal", area: "2. Comercio", objective: "Proteger el inventario y valores de caja mediante sistemas de vigilancia y protocolos de prevención." },
+            { id: 20, name: "Diagnóstico de Inteligencia de Precios frente a la Competencia", type: "Funcional", area: "2. Comercio", objective: "Monitorear precios de mercado locales para mantener competitividad sin sacrificar márgenes de utilidad." },
+
+            // --- ÁREA 3: Construcción (5 Funcionales, 5 Transversales) ---
+            { id: 21, name: "Diagnóstico de Control de Obra y Desviaciones Presupuestales", type: "Funcional", area: "3. Construcción", objective: "Supervisar avance físico versus financiero para evitar sobrecostos en proyectos de edificación." },
+            { id: 22, name: "Diagnóstico de Seguridad Estructural y Prevención de Riesgos en Obra", type: "Transversal", area: "3. Construcción", objective: "Asegurar el cumplimiento estricto de normas de protección civil y uso de equipo de seguridad en altura." },
+            { id: 23, name: "Diagnóstico de Gestión de Subcontratistas y Especialidades", type: "Funcional", area: "3. Construcción", objective: "Auditar contratos, entregables y tiempos de cuadrillas eléctricas, hidráulicas y de acabados." },
+            { id: 24, name: "Diagnóstico de Calidad de Materiales y Ensayos de Laboratorio", type: "Funcional", area: "3. Construcción", objective: "Verificar resistencia de concretos, aceros y agregados pétreos mediante pruebas normalizadas." },
+            { id: 25, name: "Diagnóstico de Cultura de Trabajo en Equipo en Frentes de Obra", type: "Transversal", area: "3. Construcción", objective: "Mejorar la coordinación diaria entre residentes de obra, ingenieros y supervisores de campo." },
+            { id: 26, name: "Diagnóstico de Logística de Maquinaria Pesada y Suministros", type: "Funcional", area: "3. Construcción", objective: "Optimizar rutas de ingreso y tiempos de renta de grúas, retroexcavadoras y camiones de volteo." },
+            { id: 27, name: "Diagnóstico de Cumplimiento Ambiental y Mitigación de Impacto", type: "Transversal", area: "3. Construcción", objective: "Controlar emisiones de polvo, ruido y manejo de escombros en zonas urbanas de construcción." },
+            { id: 28, name: "Diagnóstico de Adopción de Metodologías BIM (Building Information Modeling)", type: "Funcional", area: "3. Construcción", objective: "Implementar modelado digital tridimensional para detectar interferencias antes del inicio físico." },
+            { id: 29, name: "Diagnóstico de Gestión de Permisos, Licencias y Marco Legal", type: "Transversal", area: "3. Construcción", objective: "Verificar la vigencia de licencias de construcción y uso de suelo para prevenir clausuras gubernamentales." },
+            { id: 30, name: "Diagnóstico de Planificación de Cronogramas Críticos (Ruta Crítica)", type: "Funcional", area: "3. Construcción", objective: "Identificar actividades clave cuya demora retrasaría la entrega final del proyecto inmobiliario." },
+
+            // --- ÁREA 4: Mujeres empresarias (5 Funcionales, 5 Transversales) ---
+            { id: 31, name: "Diagnóstico de Acceso a Financiamiento y Capital Semilla Femenino", type: "Funcional", area: "4. Mujeres empresarias", objective: "Evaluar la elegibilidad y preparación de carpetas ejecutivas para fondos de inversión dirigidos a mujeres." },
+            { id: 32, name: "Diagnóstico de Liderazgo Femenino y Redes de Apoyo Empresarial", type: "Transversal", area: "4. Mujeres empresarias", objective: "Potenciar la participación de empresarias en consejos de mentoría y networking estratégico regional." },
+            { id: 33, name: "Diagnóstico de Estructuración de Negocios con Perspectiva de Género", type: "Funcional", area: "4. Mujeres empresarias", objective: "Asegurar que los modelos operativos impulsen la equidad salarial y desarrollo de talento femenino." },
+            { id: 34, name: "Diagnóstico de Conciliación entre Vida Personal, Familiar y Empresarial", type: "Transversal", area: "4. Mujeres empresarias", objective: "Implementar esquemas flexibles de trabajo para prevenir el desgaste directivo (burnout) en líderes." },
+            { id: 35, name: "Diagnóstico de Rentabilidad y Escalabilidad de Emprendimientos", type: "Funcional", area: "4. Mujeres empresarias", objective: "Analizar márgenes de utilidad para transformar negocios locales en empresas de alto impacto regional." },
+            { id: 36, name: "Diagnóstico de Cultura de Negociación y Empoderamiento Directivo", type: "Transversal", area: "4. Mujeres empresarias", objective: "Fortalecer habilidades de asertividad y defensa de postura en mesas de negociación complejas." },
+            { id: 37, name: "Diagnóstico de Gestión de Proveedores con Sello de Empresa Dirigida por Mujeres", type: "Funcional", area: "4. Mujeres empresarias", objective: "Certificar estándares de calidad para acceder a cadenas de suministro de corporativos multinacionales." },
+            { id: 38, name: "Diagnóstico de Mentoría y Desarrollo de Nuevas Líderes Emergentes", type: "Transversal", area: "4. Mujeres empresarias", objective: "Crear programas internos de guía y acompañamiento para talentos femeninos en mandos medios." },
+            { id: 39, name: "Diagnóstico de Gobierno Corporativo en Empresas Lideradas por Mujeres", type: "Funcional", area: "4. Mujeres empresarias", objective: "Institucionalizar la toma de decisiones separando la administración operativa del consejo directivo." },
+            { id: 40, name: "Diagnóstico de Visibilidad, Marca Personal y Posicionamiento Público", type: "Transversal", area: "4. Mujeres empresarias", objective: "Impulsar la presencia de la empresaria en foros, medios y comités consultivos de liderazgo." },
+
+            // --- ÁREA 5: Patrones empresarios (5 Funcionales, 5 Transversales) ---
+            { id: 41, name: "Diagnóstico de Cumplimiento de Obligaciones Patronales (IMSS/Infonavit/STPS)", type: "Funcional", area: "5. Patrones empresarios", objective: "Revisar el apego estricto a la Ley Federal del Trabajo en materia de contratos, prestaciones y seguridad." },
+            { id: 42, name: "Diagnóstico de Cultura de Diálogo Social y Relaciones Laborales", type: "Transversal", area: "5. Patrones empresarios", objective: "Fomentar una relación armónica y constructiva con sindicatos y comités internos de trabajadores." },
+            { id: 43, name: "Diagnóstico de Prevención de Riesgos Legales Laborales y Demandas", type: "Funcional", area: "5. Patrones empresarios", objective: "Auditar expedientes de personal y actas administrativas para blindar a la empresa ante litigios." },
+            { id: 44, name: "Diagnóstico de Responsabilidad Social Patronal y Bienestar del Colaborador", type: "Transversal", area: "5. Patrones empresarios", objective: "Impulsar programas de apoyo a la salud mental, económica y familiar de la plantilla de trabajo." },
+            { id: 45, name: "Diagnóstico de Estructura de Compensaciones y Prestaciones Superiores", type: "Funcional", area: "5. Patrones empresarios", objective: "Diseñar tableros de retribución competitivos para retener al mejor talento especializado del mercado." },
+            { id: 46, name: "Diagnóstico de Clima de Paz Laboral y Prevención de Hostigamiento (NOM-035)", type: "Transversal", area: "5. Patrones empresarios", objective: "Identificar factores de riesgo psicosocial en el centro de trabajo para asegurar un ambiente seguro." },
+            { id: 47, name: "Diagnóstico de Gestión de Nóminas y Optimización de Costos de Personal", type: "Funcional", area: "5. Patrones empresarios", objective: "Asegurar la correcta dispersión salarial y cálculo de impuestos sobre nómina sin errores operativos." },
+            { id: 48, name: "Diagnóstico de Capacitación Patronal en Nuevas Normativas del Trabajo", type: "Transversal", area: "5. Patrones empresarios", objective: "Mantener actualizados a los mandos gerenciales sobre reformas al marco laboral vigente." },
+            { id: 49, name: "Diagnóstico de Protocolos de Reestructura de Personal y Liquidaciones", type: "Funcional", area: "5. Patrones empresarios", objective: "Planificar procesos de ajuste de plantilla bajo estricto apego legal y trato humano." },
+            { id: 50, name: "Diagnóstico de Ética y Transparencia en la Representación Patronal", type: "Transversal", area: "5. Patrones empresarios", objective: "Consolidar una imagen de liderazgo empresarial responsable, íntegro y comprometido con la comunidad." },
+
+            // --- ÁREA 6: Contable financiero fiscal (5 Funcionales, 5 Transversales) ---
+            { id: 51, name: "Diagnóstico de Integridad y Conciliación de Registros Contables", type: "Funcional", area: "6. Contable financiero fiscal", objective: "Garantizar que libros diarios, mayores y balanzas de comprobación cuadren sin discrepancias." },
+            { id: 52, name: "Diagnóstico de Cultura de Control de Gastos y Comprobación", type: "Transversal", area: "6. Contable financiero fiscal", objective: "Fomentar la puntualidad y veracidad en la entrega de viáticos y comprobantes de gastos por el personal." },
+            { id: 53, name: "Diagnóstico de Salud Financiera, Liquidez y Solvencia", type: "Funcional", area: "6. Contable financiero fiscal", objective: "Analizar razones de circulante, prueba ácida y endeudamiento para asegurar estabilidad económica." },
+            { id: 54, name: "Diagnóstico de Cultura de Austeridad y Eficiencia Financiera", type: "Transversal", area: "6. Contable financiero fiscal", objective: "Sensibilizar a todo el personal sobre la importancia del ahorro de insumos y recursos operativos." },
+            { id: 55, name: "Diagnóstico de Cumplimiento de Obligaciones Fiscales (SAT / Leyes)", type: "Funcional", area: "6. Contable financiero fiscal", objective: "Verificar la presentación oportuna de declaraciones provisionales, anuales e informativas." },
+            { id: 56, name: "Diagnóstico de Cultura de Legalidad y Prevención de Riesgos Tributarios", type: "Transversal", area: "6. Contable financiero fiscal", objective: "Fomentar el apego estricto a las disposiciones fiscales vigentes evitando prácticas de evasión." },
+            { id: 57, name: "Diagnóstico de Control de Cuentas por Cobrar y Pagar", type: "Funcional", area: "6. Contable financiero fiscal", objective: "Minimizar cartera vencida y optimizar fechas de pago a proveedores sin dañar capital de trabajo." },
+            { id: 58, name: "Diagnóstico de Capacitación Financiera para No Financieros", type: "Transversal", area: "6. Contable financiero fiscal", objective: "Enseñar a líderes de área conceptos básicos contables para mejorar la gestión de sus presupuestos." },
+            { id: 59, name: "Diagnóstico de Validación de CFDI y Proveedores en Listas Negras", type: "Funcional", area: "6. Contable financiero fiscal", objective: "Revisar que los comprobantes fiscales recibidos no correspondan a empresas con operaciones simuladas." },
+            { id: 60, name: "Diagnóstico de Preparación para Auditorías Contables y Fiscales Externas", type: "Transversal", area: "6. Contable financiero fiscal", objective: "Tener expedientes limpios y ordenados para facilitar revisiones de despachos contables externos." },
+
+            // --- ÁREA 7: Gestión y dirección estratégica (5 Funcionales, 5 Transversales) ---
+            { id: 61, name: "Diagnóstico de Alineación Estratégica y Objetivos (OKRs / KPIs)", type: "Funcional", area: "7. Gestión y dirección estratégica", objective: "Garantizar que las metas departamentales correspondan con la visión y misión general de la compañía." },
+            { id: 62, name: "Diagnóstico de Comunicación Directiva y Claridad de Propósito", type: "Transversal", area: "7. Gestión y dirección estratégica", objective: "Transmitir la dirección de la empresa de forma transparente para alinear el esfuerzo de todo el equipo." },
+            { id: 63, name: "Diagnóstico de Gestión de Riesgos Corporativos y Contingencias", type: "Funcional", area: "7. Gestión y dirección estratégica", objective: "Identificar amenazas operativas, financieras y de mercado para establecer planes de mitigación." },
+            { id: 64, name: "Diagnóstico de Liderazgo Ejecutivo y Resolución de Conflictos", type: "Transversal", area: "7. Gestión y dirección estratégica", objective: "Evaluar la eficacia de los directivos en la guía de equipos y la mediación de desacuerdos internos." },
+            { id: 65, name: "Diagnóstico de Gobernanza de Datos y Toma de Decisiones Informadas", type: "Funcional", area: "7. Gestión y dirección estratégica", objective: "Asegurar que la alta gerencia base sus decisiones en métricas confiables y tableros en tiempo real." },
+            { id: 66, name: "Diagnóstico de Gestión del Cambio Organizacional ante Reestructuras", type: "Transversal", area: "7. Gestión y dirección estratégica", objective: "Facilitar la transición del personal durante fusiones, adquisiciones o cambios profundos de procesos." },
+            { id: 67, name: "Diagnóstico de Sostenibilidad Estratégica y Criterios ASG", type: "Funcional", area: "7. Gestión y dirección estratégica", objective: "Integrar criterios ambientales, sociales y de gobernanza en la planeación a mediano y largo plazo." },
+            { id: 68, name: "Diagnóstico de Clima de Colaboración Interdepartamental", type: "Transversal", area: "7. Gestión y dirección estratégica", objective: "Romper silos operativos fomentando la cooperación fluida entre áreas comerciales, técnicas y administrativas." },
+            { id: 69, name: "Diagnóstico de Auditoría de Procesos de Alta Dirección", type: "Funcional", area: "7. Gestión y dirección estratégica", objective: "Revisar la eficiencia en la ejecución de juntas directivas, comités y acuerdos gerenciales." },
+            { id: 70, name: "Diagnóstico de Cultura de Ética y Transparencia Corporativa", type: "Transversal", area: "7. Gestión y dirección estratégica", objective: "Vigilar el cumplimiento estricto del código de conducta y canales de denuncia anónima." },
+
+            // --- ÁREA 8: Energía renovable (5 Funcionales, 5 Transversales) ---
+            { id: 71, name: "Diagnóstico de Potencial Fotovoltaico y Generación Solar en Sitio", type: "Funcional", area: "8. Energía renovable", objective: "Analizar superficies de techos y naves para dimensionar sistemas de paneles solares de autoabastecimiento." },
+            { id: 72, name: "Diagnóstico de Cultura de Eficiencia Energética y Ahorro Verde", type: "Transversal", area: "8. Energía renovable", objective: "Inculcar hábitos cotidianos de apagado de equipos y uso racional de energía en todo el personal." },
+            { id: 73, name: "Diagnóstico de Integración de Sistemas de Almacenamiento en Baterías", type: "Funcional", area: "8. Energía renovable", objective: "Evaluar bancos de baterías para respaldo ante intermitencias y optimización de tarifas de demanda pico." },
+            { id: 74, name: "Diagnóstico de Conciencia Ambiental y Transición Energética", type: "Transversal", area: "8. Energía renovable", objective: "Sensibilizar a la organización sobre la urgencia de reducir emisiones de gases de efecto invernadero." },
+            { id: 75, name: "Diagnóstico de Auditoría de Eficiencia Térmica y Cogeneración", type: "Funcional", area: "8. Energía renovable", objective: "Revisar calderas, sistemas de vapor y recuperación de calor residual para maximizar el uso de energía." },
+            { id: 76, name: "Diagnóstico de Capacitación en Tecnologías Limpias para Operarios", type: "Transversal", area: "8. Energía renovable", objective: "Formar al equipo técnico en el mantenimiento preventivo de infraestructura de energías renovables." },
+            { id: 77, name: "Diagnóstico de Cumplimiento Regulatorio con el Mercado Eléctrico", type: "Funcional", area: "8. Energía renovable", objective: "Verificar permisos ante la CRE y CENACE para esquemas de generación distribuida o abasto aislado." },
+            { id: 78, name: "Diagnóstico de Cultura de Sostenibilidad y Reducción de Huella de Carbono", type: "Transversal", area: "8. Energía renovable", objective: "Involucrar a los departamentos en metas conjuntas para certificar a la empresa como verde y sustentable." },
+            { id: 79, name: "Diagnóstico de Viabilidad de Energía Eólica de Baja Escala", type: "Funcional", area: "8. Energía renovable", objective: "Medir velocidades de viento locales para evaluar aerogeneradores complementarios en plantas." },
+            { id: 80, name: "Diagnóstico de Comunicación de Compromiso Ecológico con Clientes", type: "Transversal", area: "8. Energía renovable", objective: "Difundir las iniciativas de energía limpia de la empresa para fortalecer su reputación comercial." },
+
+            // --- ÁREA 9: Diseño estratégico (5 Funcionales, 5 Transversales) ---
+            { id: 81, name: "Diagnóstico de Metodología de Diseño Centrado en el Usuario (UX)", type: "Funcional", area: "9. Diseño estratégico", objective: "Investigar profundamente las necesidades de los usuarios para estructurar soluciones con alto valor." },
+            { id: 82, name: "Diagnóstico de Cultura de Pensamiento de Diseño (Design Thinking)", type: "Transversal", area: "9. Diseño estratégico", objective: "Inculcar empatía, ideación y prototipado rápido en equipos multidisciplinarios de la empresa." },
+            { id: 83, name: "Diagnóstico de Identidad de Marca y Coherencia Visual", type: "Funcional", area: "9. Diseño estratégico", objective: "Asegurar que la imagen corporativa refleje consistentemente los valores y calidad de la organización." },
+            { id: 84, name: "Diagnóstico de Prototipado Rápido y Pruebas de Concepto", type: "Transversal", area: "9. Diseño estratégico", objective: "Validar ideas de productos o servicios con clientes reales antes de comprometer presupuestos masivos." },
+            { id: 85, name: "Diagnóstico de Arquitectura de Experiencia del Cliente (Customer Journey)", type: "Funcional", area: "9. Diseño estratégico", objective: "Mapear cada punto de contacto del cliente con la empresa para eliminar fricciones y sorpresas negativas." },
+            { id: 86, name: "Diagnóstico de Innovación de Modelos de Negocio (Service Design)", type: "Funcional", area: "9. Diseño estratégico", objective: "Rediseñar servicios complejos integrando canales físicos y digitales en una experiencia unificada." },
+            { id: 87, name: "Diagnóstico de Co-creación y Talleres de Ideación Participativa", type: "Transversal", area: "9. Diseño estratégico", objective: "Involucrar a clientes, proveedores y empleados en sesiones creativas para resolver retos complejos." },
+            { id: 88, name: "Diagnóstico de Diseño de Espacios Físicos y Entornos de Trabajo", type: "Funcional", area: "9. Diseño estratégico", objective: "Acondicionar oficinas y centros de trabajo para estimular la creatividad, concentración y bienestar." },
+            { id: 89, name: "Diagnóstico de Storytelling y Comunicación Estratégica de Marca", type: "Transversal", area: "9. Diseño estratégico", objective: "Transmitir la narrativa de la empresa de forma memorable para conectar emocionalmente con audiencias." },
+            { id: 90, name: "Diagnóstico de Evaluación de Impacto Estético y Funcional", type: "Funcional", area: "9. Diseño estratégico", objective: "Medir si los productos y servicios diseñados equilibran de forma óptima belleza visual y utilidad." },
+
+            // --- ÁREA 10: Innovación y tecnología (5 Funcionales, 5 Transversales) ---
+            { id: 91, name: "Diagnóstico de Madurez en Transformación Digital e Inteligencia Artificial", type: "Funcional", area: "10. Innovación y tecnología", objective: "Evaluar la incorporación de algoritmos de IA, automatización y análisis masivo de datos (Big Data)." },
+            { id: 92, name: "Diagnóstico de Cultura de Innovación Abierta y Creatividad", type: "Transversal", area: "10. Innovación y tecnología", objective: "Estimular la experimentación sin temor al fracaso y el aporte de ideas disruptivas por cualquier empleado." },
+            { id: 93, name: "Diagnóstico de Ciberseguridad y Resiliencia en Sistemas IT", type: "Funcional", area: "10. Innovación y tecnología", objective: "Blindar servidores, bases de datos y redes corporativas contra ataques de ransomware y filtraciones." },
+            { id: 94, name: "Diagnóstico de Alfabetización Tecnológica del Capital Humano", type: "Transversal", area: "10. Innovación y tecnología", objective: "Capacitar al personal no técnico en el uso seguro y eficiente de software colaborativo y en la nube." },
+            { id: 95, name: "Diagnóstico de Arquitectura Cloud y Escalabilidad de Sistemas", type: "Funcional", area: "10. Innovación y tecnología", objective: "Garantizar que la infraestructura tecnológica soporte crecimientos exponenciales de usuarios sin latencia." },
+            { id: 96, name: "Diagnóstico de Gestión de Proyectos Tecnológicos (Agile/Scrum)", type: "Transversal", area: "10. Innovación y tecnología", objective: "Implementar marcos de trabajo ágiles para acelerar el lanzamiento de productos digitales al mercado." },
+            { id: 97, name: "Diagnóstico de Interoperabilidad y APIs entre Sistemas Legados", type: "Funcional", area: "10. Innovación y tecnología", objective: "Conectar software antiguo con plataformas modernas de última generación de manera fluida." },
+            { id: 98, name: "Diagnóstico de Accesibilidad y Experiencia de Usuario (UX/UI)", type: "Transversal", area: "10. Innovación y tecnología", objective: "Asegurar que aplicaciones internas y externas sean intuitivas y cumplan con accesibilidad universal." },
+            { id: 99, name: "Diagnóstico de Inventario y Ciclo de Vida de Activos Tecnológicos", type: "Funcional", area: "10. Innovación y tecnología", objective: "Planificar la renovación oportuna de equipos de cómputo, licencias de software y servidores." },
+            { id: 100, name: "Diagnóstico de Soporte Técnico y Tiempos de Resolución de Incidentes", type: "Transversal", area: "10. Innovación y tecnología", objective: "Minimizar el tiempo de inactividad de los colaboradores ante fallas en equipos de cómputo o redes." },
+
+            // --- ÁREA 11: Competitividad empresarial (5 Funcionales, 5 Transversales) ---
+            { id: 101, name: "Diagnóstico de Benchmarking y Posicionamiento Competitivo", type: "Funcional", area: "11. Competitividad empresarial", objective: "Comparar indicadores clave de rendimiento (KPIs) frente a los líderes mundiales de la industria." },
+            { id: 102, name: "Diagnóstico de Cultura de Mejora Continua y Agilidad Operativa", type: "Transversal", area: "11. Competitividad empresarial", objective: "Inculcar rapidez de adaptación ante cambios imprevistos en las reglas del mercado." },
+            { id: 103, name: "Diagnóstico de Propuesta de Valor y Ventaja Diferencial", type: "Funcional", area: "11. Competitividad empresarial", objective: "Revisar por qué los clientes eligen a la empresa por encima de opciones sustitutas más baratas." },
+            { id: 104, name: "Diagnóstico de Productividad Laboral y Eficiencia de Equipos", type: "Transversal", area: "11. Competitividad empresarial", objective: "Medir la relación entre horas trabajadas y valor generado para eliminar cuellos de botella organizacionales." },
+            { id: 105, name: "Diagnóstico de Integración en Cadenas Globales de Valor", type: "Funcional", area: "11. Competitividad empresarial", objective: "Cumplir estándares internacionales de exportación para participar como proveedor de multinacionales." },
+            { id: 106, name: "Diagnóstico de Adaptabilidad ante Disrupciones de Mercado", type: "Transversal", area: "11. Competitividad empresarial", objective: "Evaluar planes de contingencia y resiliencia corporativa ante crisis económicas o sanitarias." },
+            { id: 107, name: "Diagnóstico de Eficiencia en Costos Logísticos y Operativos", type: "Funcional", area: "11. Competitividad empresarial", objective: "Identificar sobrecostos ocultos que merman los márgenes de ganancia frente a la competencia." },
+            { id: 108, name: "Diagnóstico de Capacitación y Desarrollo de Talento Competitivo", type: "Transversal", area: "11. Competitividad empresarial", objective: "Asegurar que la formación continua del personal responda a exigencias internacionales de calidad." },
+            { id: 109, name: "Diagnóstico de Gestión de la Propiedad Intelectual Competitiva", type: "Funcional", area: "11. Competitividad empresarial", objective: "Proteger patentes, secretos industriales y registros de marca como activos de diferenciación." },
+            { id: 110, name: "Diagnóstico de Clima de Alta Competencia y Meritocracia", type: "Transversal", area: "11. Competitividad empresarial", objective: "Reconocer y recompensar el esfuerzo extraordinario basado en resultados objetivos y medibles." }
+        ];
+
+        class CatalogApp {
+            constructor() {
+                this.data = rawDataset;
+                this.filteredData = [...this.data];
+                this.currentType = 'all';
+                this.currentArea = 'all';
+                this.searchQuery = '';
+                this.viewMode = 'grid'; // 'grid' or 'table'
+                this.currentPage = 1;
+                this.itemsPerPage = 12;
+                this.isAreaExplorerOpen = false;
+                
+                this.init();
+            }
+
+            init() {
+                this.populateAreaSelect();
+                this.populateAreaExplorerGrid();
+                this.updateMetrics();
+                this.render();
+                this.setupEventListeners();
+                lucide.createIcons();
+            }
+
+            setupEventListeners() {
+                const searchInput = document.getElementById('searchInput');
+                searchInput.addEventListener('input', (e) => {
+                    this.searchQuery = e.target.value.toLowerCase();
+                    this.currentPage = 1;
+                    this.filterData();
+                });
+            }
+
+            getDistinctAreas() {
+                return [...new Set(this.data.map(item => item.area))].sort((a,b) => {
+                    const numA = parseInt(a.split('.')[0]);
+                    const numB = parseInt(b.split('.')[0]);
+                    return numA - numB;
+                });
+            }
+
+            populateAreaSelect() {
+                const areas = this.getDistinctAreas();
+                const select = document.getElementById('areaFilter');
+                
+                select.innerHTML = '<option value="all">Todas las 11 Áreas Temáticas</option>';
+
+                areas.forEach(area => {
+                    const option = document.createElement('option');
+                    option.value = area;
+                    option.textContent = area;
+                    select.appendChild(option);
+                });
+
+                document.getElementById('areasCount').textContent = areas.length;
+            }
+
+            populateAreaExplorerGrid() {
+                const areas = this.getDistinctAreas();
+                const container = document.getElementById('areaExplorerGrid');
+                let html = '';
+
+                areas.forEach(area => {
+                    const areaNumber = area.split('.')[0];
+                    const areaTitle = area.split('. ')[1] || area;
+                    const count = this.data.filter(i => i.area === area).length;
+                    const funcCount = this.data.filter(i => i.area === area && i.type === 'Funcional').length;
+                    const transCount = this.data.filter(i => i.area === area && i.type === 'Transversal').length;
+
+                    html += `
+                        <div onclick="app.selectAreaFromExplorer('${area}')" class="p-3.5 bg-slate-50 hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-xl cursor-pointer transition-all flex flex-col justify-between group shadow-sm">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold px-2 py-0.5 bg-sky-100 text-sky-800 rounded-md">Área ${areaNumber}</span>
+                                    <span class="text-xs text-slate-500 font-semibold">${count} Diagnósticos</span>
+                                </div>
+                                <h4 class="text-xs font-bold text-slate-800 group-hover:text-sky-700 transition-colors line-clamp-2">${areaTitle}</h4>
+                            </div>
+                            <div class="mt-3 pt-2 border-t border-slate-200 flex justify-between text-[11px] font-medium text-slate-600">
+                                <span class="text-sky-600">${funcCount} Funcionales</span>
+                                <span class="text-cyan-700">${transCount} Transversales</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }
+
+            toggleAreaExplorer() {
+                this.isAreaExplorerOpen = !this.isAreaExplorerOpen;
+                const section = document.getElementById('areaExplorerSection');
+                const toggleText = document.getElementById('areaExplorerToggleText');
+
+                if (this.isAreaExplorerOpen) {
+                    section.classList.remove('hidden');
+                    toggleText.textContent = 'Cerrar explorador';
+                    section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    section.classList.add('hidden');
+                    toggleText.textContent = 'Abrir para explorar áreas (1-11)';
+                }
+            }
+
+            selectAreaFromExplorer(areaName) {
+                this.currentArea = areaName;
+                this.currentType = 'all'; // reset type filter when picking specific area
+                document.getElementById('areaFilter').value = areaName;
+                
+                document.querySelectorAll('.type-btn').forEach((btn, index) => {
+                    if (index === 0) {
+                        btn.className = 'type-btn px-4 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white shadow-sm transition-all';
+                    } else {
+                        btn.className = 'type-btn px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+                    }
+                });
+
+                this.currentPage = 1;
+                this.filterData();
+                this.toggleAreaExplorer();
+                this.showToast(`Mostrando los 10 diagnósticos de: ${areaName}`);
+            }
+
+            handleCardClick(cardType) {
+                if (cardType === 'all') {
+                    this.currentType = 'all';
+                    this.currentArea = 'all';
+                    document.getElementById('areaFilter').value = 'all';
+                    this.showToast('Mostrando todos los 110 diagnósticos');
+                } else if (cardType === 'Funcional') {
+                    this.currentType = 'Funcional';
+                    this.showToast('Filtrando los 55 diagnósticos funcionales');
+                } else if (cardType === 'Transversal') {
+                    this.currentType = 'Transversal';
+                    this.showToast('Filtrando los 55 diagnósticos transversales');
+                }
+
+                document.querySelectorAll('.type-btn').forEach(btn => {
+                    const txt = btn.textContent.toLowerCase();
+                    if ((cardType === 'all' && txt.includes('todos')) || 
+                        (cardType === 'Funcional' && txt.includes('funcionales')) ||
+                        (cardType === 'Transversal' && txt.includes('transversales'))) {
+                        btn.className = 'type-btn px-4 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white shadow-sm transition-all';
+                    } else {
+                        btn.className = 'type-btn px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+                    }
+                });
+
+                this.currentPage = 1;
+                this.filterData();
+            }
+
+            setTypeFilter(type) {
+                this.currentType = type;
+                this.currentPage = 1;
+                
+                document.querySelectorAll('.type-btn').forEach(btn => {
+                    const txt = btn.textContent.toLowerCase();
+                    if((type === 'all' && txt.includes('todos')) || txt.includes(type.toLowerCase())) {
+                        btn.className = 'type-btn px-4 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white shadow-sm transition-all';
+                    } else {
+                        btn.className = 'type-btn px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+                    }
+                });
+
+                this.filterData();
+            }
+
+            setAreaFilter(area) {
+                this.currentArea = area;
+                this.currentPage = 1;
+                this.filterData();
+            }
+
+            setViewMode(mode) {
+                this.viewMode = mode;
+                const gridBtn = document.getElementById('viewGridBtn');
+                const tableBtn = document.getElementById('viewTableBtn');
+
+                if (mode === 'grid') {
+                    gridBtn.className = 'p-2 rounded-lg text-sky-600 bg-white shadow-sm transition-colors';
+                    tableBtn.className = 'p-2 rounded-lg text-slate-500 hover:bg-white transition-colors';
+                } else {
+                    tableBtn.className = 'p-2 rounded-lg text-sky-600 bg-white shadow-sm transition-colors';
+                    gridBtn.className = 'p-2 rounded-lg text-slate-500 hover:bg-white transition-colors';
+                }
+
+                this.render();
+            }
+
+            filterData() {
+                this.filteredData = this.data.filter(item => {
+                    const matchesType = this.currentType === 'all' || item.type === this.currentType;
+                    const matchesArea = this.currentArea === 'all' || item.area === this.currentArea;
+                    const matchesSearch = item.name.toLowerCase().includes(this.searchQuery) || 
+                                          item.objective.toLowerCase().includes(this.searchQuery) ||
+                                          item.area.toLowerCase().includes(this.searchQuery);
+                    return matchesType && matchesArea && matchesSearch;
+                });
+
+                this.updateMetrics();
+                this.render();
+            }
+
+            updateMetrics() {
+                document.getElementById('totalCount').textContent = '110';
+                document.getElementById('funcionalCount').textContent = '55';
+                document.getElementById('transversalCount').textContent = '55';
+            }
+
+            render() {
+                const container = document.getElementById('contentContainer');
+                const start = (this.currentPage - 1) * this.itemsPerPage;
+                const end = start + this.itemsPerPage;
+                const paginatedItems = this.filteredData.slice(start, end);
+
+                if (this.filteredData.length === 0) {
+                    container.innerHTML = `
+                        <div class="metallic-card rounded-2xl p-12 text-center flex flex-col items-center justify-center">
+                            <div class="p-4 bg-sky-50 rounded-full text-sky-500 mb-3 shadow-inner">
+                                <i data-lucide="search-x" class="w-8 h-8"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-800">No se encontraron diagnósticos</h3>
+                            <p class="text-sm text-slate-500 mt-1">Intenta ajustando los filtros o el término de búsqueda introducido.</p>
+                        </div>
+                    `;
+                    document.getElementById('paginationContainer').style.display = 'none';
+                    lucide.createIcons();
+                    return;
+                }
+
+                document.getElementById('paginationContainer').style.display = 'flex';
+
+                if (this.viewMode === 'grid') {
+                    let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+                    paginatedItems.forEach(item => {
+                        const typeBadgeColor = item.type === 'Funcional' 
+                            ? 'bg-sky-50 text-sky-700 border-sky-200' 
+                            : 'bg-cyan-50 text-cyan-800 border-cyan-200';
+                        
+                        html += `
+                            <div class="metallic-card rounded-2xl p-6 flex flex-col justify-between group">
+                                <div>
+                                    <div class="flex justify-between items-start gap-2 mb-3.5">
+                                        <span class="px-3 py-1 text-xs font-bold rounded-full border ${typeBadgeColor}">
+                                            ${item.type}
+                                        </span>
+                                        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                                            ${item.area.split('. ')[0]}
+                                        </span>
+                                    </div>
+                                    <h3 class="font-bold text-slate-900 text-base mb-2.5 group-hover:text-sky-600 transition-colors line-clamp-2">
+                                        ${item.id}. ${item.name}
+                                    </h3>
+                                    <p class="text-slate-600 text-xs leading-relaxed line-clamp-3 mb-5">
+                                        <strong class="text-slate-800 font-semibold">Objetivo:</strong> ${item.objective}
+                                    </p>
+                                </div>
+                                <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+                                    <span class="text-[11px] text-slate-400 font-medium truncate max-w-[160px]" title="${item.area}">${item.area}</span>
+                                    <button onclick="app.openModal(${item.id})" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold transition-all shadow-sm">
+                                        <span>Ver Detalle</span>
+                                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                } else {
+                    let html = `
+                        <div class="metallic-card rounded-2xl overflow-hidden shadow-sm">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                                            <th class="py-4 px-5">#</th>
+                                            <th class="py-4 px-5">Diagnóstico</th>
+                                            <th class="py-4 px-5">Tipo</th>
+                                            <th class="py-4 px-5">Área Temática</th>
+                                            <th class="py-4 px-5">Objetivo Principal</th>
+                                            <th class="py-4 px-5 text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
+                    `;
+
+                    paginatedItems.forEach(item => {
+                        const typeBadgeColor = item.type === 'Funcional' 
+                            ? 'bg-sky-50 text-sky-700 border-sky-200' 
+                            : 'bg-cyan-50 text-cyan-800 border-cyan-200';
+
+                        html += `
+                            <tr class="hover:bg-sky-50/40 transition-colors">
+                                <td class="py-4 px-5 font-bold text-slate-500">${item.id}</td>
+                                <td class="py-4 px-5 font-bold text-slate-900 max-w-xs truncate" title="${item.name}">${item.name}</td>
+                                <td class="py-4 px-5">
+                                    <span class="px-3 py-1 text-xs font-bold rounded-full border ${typeBadgeColor}">
+                                        ${item.type}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-5 text-slate-600 font-medium">${item.area}</td>
+                                <td class="py-4 px-5 text-slate-600 max-w-sm truncate" title="${item.objective}">${item.objective}</td>
+                                <td class="py-4 px-5 text-center">
+                                    <button onclick="app.openModal(${item.id})" class="p-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl transition-all inline-flex items-center justify-center shadow-sm" title="Ver Detalle">
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML = html;
+                }
+
+                this.updatePagination();
+                lucide.createIcons();
+            }
+
+            updatePagination() {
+                const totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage) || 1;
+                const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+                const end = Math.min(this.currentPage * this.itemsPerPage, this.filteredData.length);
+
+                document.getElementById('paginationInfo').textContent = 
+                    this.filteredData.length > 0 
+                        ? `Mostrando ${start} a ${end} de ${this.filteredData.length} diagnósticos filtrados`
+                        : 'Sin resultados';
+
+                document.getElementById('prevPageBtn').disabled = this.currentPage === 1;
+                document.getElementById('nextPageBtn').disabled = this.currentPage >= totalPages;
+            }
+
+            prevPage() {
+                if (this.currentPage > 1) {
+                    this.currentPage--;
+                    this.render();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+
+            nextPage() {
+                const totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+                if (this.currentPage < totalPages) {
+                    this.currentPage++;
+                    this.render();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+
+            openModal(id) {
+                const item = this.data.find(d => d.id === id);
+                if (!item) return;
+
+                document.getElementById('modalTitle').textContent = `Diagnóstico #${item.id}`;
+                document.getElementById('modalType').textContent = item.type;
+                document.getElementById('modalArea').textContent = item.area;
+                document.getElementById('modalName').textContent = item.name;
+                document.getElementById('modalObjective').textContent = item.objective;
+
+                const modal = document.getElementById('detailModal');
+                modal.classList.remove('hidden');
+            }
+
+            closeModal() {
+                const modal = document.getElementById('detailModal');
+                modal.classList.add('hidden');
+            }
+
+            exportData() {
+                let csv = 'ID,Nombre,Tipo,Area Tematica,Objetivo\n';
+                this.filteredData.forEach(item => {
+                    csv += `"${item.id}","${item.name.replace(/"/g, '""')}","${item.type}","${item.area.replace(/"/g, '""')}","${item.objective.replace(/"/g, '""')}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'catalogo_diagnosticos_110_especializado.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                this.showToast('Catálogo exportado exitosamente en formato CSV');
+            }
+
+            showToast(message) {
+                const toast = document.getElementById('toast');
+                document.getElementById('toastMessage').textContent = message;
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            }
+        }
+
+        let app;
+        window.onload = function() {
+            app = new CatalogApp();
+        };
+    </script>
+</body>
+</html>
